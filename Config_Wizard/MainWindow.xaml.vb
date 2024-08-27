@@ -4,10 +4,9 @@ Imports Microsoft.Win32
 Imports Infragistics.Windows.DataPresenter
 Imports Infragistics.Windows.DataPresenter.Events
 Imports System.ComponentModel
-Imports System.Data.SqlClient
 Imports System.Security.Principal
 Imports Infragistics.Documents.Excel
-'This is the latest version
+
 Class MainWindow
     Dim CommentStarted As Boolean = False
     Dim Linenum As Integer
@@ -817,13 +816,13 @@ Class MainWindow
         dialog.ShowDialog()
 
         Try
-            exportStream = dialog.OpenFile()
-            dataWorkbook.Save(exportStream)
-            exportStream.Close()
-            Process.Start(dialog.FileName)
-        Catch ex As Exception
-            System.Windows.MessageBox.Show(ex.Message)
-        End Try
+                exportStream = dialog.OpenFile()
+                dataWorkbook.Save(exportStream)
+                exportStream.Close()
+                Process.Start(dialog.FileName)
+            Catch ex As Exception
+                System.Windows.MessageBox.Show(ex.Message)
+            End Try
 
 
     End Sub
