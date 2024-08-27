@@ -1,0 +1,420 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Config_Wizard"
+        xmlns:igWin="http://infragistics.com/Windows" xmlns:igDP="http://infragistics.com/DataPresenter" xmlns:ig="http://schemas.infragistics.com/xaml" xmlns:igEditors="http://infragistics.com/Editors" x:Class="MainWindow"
+        mc:Ignorable="d"
+        Title="P500 Configuration Wizard" Height="450" Width="800" Icon="/Images/Dev.ico">
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Themes/Metro.MSControls.Core.Implicit.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <local:Edit_Made_Converter x:Key="Edit_Made"/>
+            <Style x:Key="style_TimeStamp" TargetType="{x:Type igEditors:XamDateTimeEditor}">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Format" Value="MM/dd/yy H:mm:ss"/>
+                <Setter Property="Width" Value="200"/>
+                <Setter Property="IsReadOnly"  Value="True"/>
+            </Style>
+            <Style x:Key="style_Integer" TargetType="{x:Type igEditors:XamNumericEditor}">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Mask" Value ="{}{double:4.0}"/>
+                <Setter Property="IsReadOnly"  Value="True"/>
+            </Style>
+            <Style x:Key="style_Double" TargetType="{x:Type igEditors:XamNumericEditor}">
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Mask" Value ="{}{double:-8.2}"/>
+                <Setter Property="IsReadOnly"  Value="True"/>
+            </Style>
+        </ResourceDictionary>
+
+    </Window.Resources>
+    <Grid>
+        <igWin:XamTabControl x:Name ="TC" Theme="Metro" Margin="0,0,0,0" TabLayoutStyle="MultiRowAutoSize" >
+            <igWin:TabItemEx x:Name="Tab_Control" Header="Control">
+                <Grid>
+                    <Button x:Name="BtnOpenFile" Content="Open File" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="40" Width="120"/>
+                    <Button x:Name="BtnCompareFile" Content="Compare Files" HorizontalAlignment="Left" Margin="135,10,0,0" VerticalAlignment="Top" Height="40" Width="120" IsEnabled="False"/>
+                    <Button x:Name="BtnExport" Content="Export" HorizontalAlignment="Left" Margin="260,10,0,0" VerticalAlignment="Top" Height="40" Width="120" IsEnabled="False"/>
+                    <StackPanel Orientation="Vertical" Margin="10,55,0,0" >
+                        <CheckBox Name="Chk_Duplicates" Content="Check for duplicates"/>
+                        <CheckBox Name="Chk_Stepper" Content="Compare dosing pump settings"/>
+                    </StackPanel>
+                    <ig:XamBusyIndicator x:Name="LoadBusy" IsBusy="{Binding IsInProgress}"
+                        IsIndeterminate="False" ProgressValue="{Binding CurrentProgress}"  
+                        HorizontalAlignment="Center" VerticalAlignment="Center"  Width="200">
+                        <ig:XamBusyIndicator.Animation>
+                            <ig:SpinnerBallsBusyAnimation/>
+                        </ig:XamBusyIndicator.Animation>
+                        <ig:XamBusyIndicator.OverlayStyle>
+                            <Style TargetType="{x:Type Rectangle}">
+                                <Setter Property="Opacity" Value=".5" />
+                                <Setter Property="Fill" Value="Transparent" />
+                            </Style>
+                        </ig:XamBusyIndicator.OverlayStyle>
+                    </ig:XamBusyIndicator>
+                </Grid>
+            </igWin:TabItemEx>
+            <igWin:TabItemEx x:Name="Tab_AI" Header="Analog Inputs" IsEnabled="False" Visibility="Collapsed">
+                <Grid>
+                    <igDP:XamDataGrid x:Name="GridAI" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5,0,0" AutoFit="True">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings Width="Auto" AllowRecordFiltering="True" AllowEdit="False"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                    </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            <igWin:TabItemEx x:Name="Tab_All" Header="IO Table" IsEnabled="False">
+                <Grid>
+                    <igDP:XamDataGrid x:Name="GridAll" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Theme="Metro" Margin="0,10,0,-7">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings AllowRecordFiltering="True" AllowEdit="False"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                        <igDP:XamDataGrid.FieldLayouts>
+                            <igDP:FieldLayout Key="Layout">
+                                <igDP:Field Name="Line"  Width="60">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="In Use"  Width="70">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <!--<igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>-->
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Control Box"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="IO"  Width="70">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Type" Visibility="Collapsed">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="IO Type"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Channels"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center">
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Node"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Bit"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Name"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center">
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Invert"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Scaling"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="True" LabelTextAlignment="Center">
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                    <Setter Property="Foreground" Value="{Binding DataItem.Edited, Converter={StaticResource Edit_Made}}"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Edited" Visibility="Collapsed"/>
+                                <igDP:Field Name="Address" Visibility="Collapsed"/>
+                           
+                            </igDP:FieldLayout>
+                        </igDP:XamDataGrid.FieldLayouts>
+
+                    </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            <igWin:TabItemEx x:Name="Tab_Compare" Header="Compare Files" IsEnabled="False">
+                <Grid>
+                    <igDP:XamDataGrid x:Name="GridCompare" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Theme="Metro">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings AllowRecordFiltering="True" AllowEdit="False" LabelClickAction="Nothing"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                        
+                        <igDP:XamDataGrid.FieldLayouts>
+                            <igDP:FieldLayout Key="Layout">
+                                <igDP:Field Name="FileName" Label="File" Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Name"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+
+                                <igDP:Field Name="Control Box"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                               <igDP:Field Name="Node"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center">
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <!--<igDP:Field Name="Invert"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>-->
+                                <igDP:Field Name="Bit"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+   
+                                <igDP:Field Name="Invert"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Scaling"  Width="Auto">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center">
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                            </igDP:FieldLayout>
+                        </igDP:XamDataGrid.FieldLayouts>
+
+                    </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            
+            <igWin:TabItemEx x:Name="Tab_Dups" Header="Duplicates" IsEnabled="False">
+                <Grid>
+                    <igDP:XamDataGrid x:Name="GridDups" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" AutoFit="True" Theme="Metro">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings Width="Auto" AllowRecordFiltering="True" AllowEdit="False"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                        <!--<igDP:XamDataGrid.FieldLayoutSettings>
+                            <igDP:FieldLayoutSettings HeaderPrefixAreaDisplayMode="FieldChooserButton"/>
+                        </igDP:XamDataGrid.FieldLayoutSettings>-->
+                    </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            
+            <igWin:TabItemEx x:Name="Tab_Errors" Header="Errors" IsEnabled="False" Visibility="Collapsed">
+                <Grid>
+                    <igDP:XamDataGrid x:Name="GridErrors" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5,0,0" AutoFit="True">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings Width="Auto" AllowRecordFiltering="True" AllowEdit="False"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                        <!--<igDP:XamDataGrid.FieldLayoutSettings>
+                            <igDP:FieldLayoutSettings HeaderPrefixAreaDisplayMode="FieldChooserButton"/>
+                        </igDP:XamDataGrid.FieldLayoutSettings>-->
+                    </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            
+            <igWin:TabItemEx x:Name="Tab_Raw" Header="Raw Data" IsEnabled="False" >
+                <Grid>
+                    <igDP:XamDataGrid x:Name="GridRaw" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Theme="Metro">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings AllowRecordFiltering="True" AllowEdit="False"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                        <igDP:XamDataGrid.FieldLayouts>
+                            <igDP:FieldLayout Key="Layout">
+                                <igDP:Field Name="Line"  Width="100">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="False" LabelTextAlignment="Center"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="Data"  Width="*">
+                                    <igDP:Field.Settings>
+                                        <igDP:FieldSettings AllowEdit="True" LabelTextAlignment="Left"  >
+                                            <igDP:FieldSettings.EditorStyle>
+                                                <Style TargetType="{x:Type igEditors:XamTextEditor}">
+                                                    <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                                                </Style>
+                                            </igDP:FieldSettings.EditorStyle>
+                                        </igDP:FieldSettings>
+                                    </igDP:Field.Settings>
+                                </igDP:Field>
+                                <igDP:Field Name="WhiteSpace" Visibility="Collapsed"/>
+                            </igDP:FieldLayout>
+                        </igDP:XamDataGrid.FieldLayouts>
+                    </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            
+            <igWin:TabItemEx x:Name="Tab_Edits" Header="Data Edits" IsEnabled="False">
+                <Grid>
+                    <Button x:Name="BtnSaveFile" Content="Commit Changes and Save File" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top" Height="10" Width="230"/>
+                    <Button x:Name="BtnRejectChanges" Content="Discard Changes" HorizontalAlignment="Left" Margin="260,8,0,0" VerticalAlignment="Top" Height="10" Width="130"/>
+                    <igDP:XamDataGrid x:Name="GridEdits" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,45,0,0" AutoFit="True" Theme="Metro">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings Width="Auto" AllowEdit="False"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                      </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            
+            <igWin:TabItemEx x:Name="Tab_Dosing" Header="Dosing Pump Analysis" IsEnabled="False">
+                <Grid>
+                    <igDP:XamDataGrid x:Name="GridDosing" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0,5,0,0" AutoFit="True" Theme="Metro">
+                        <igDP:XamDataGrid.FieldSettings>
+                            <igDP:FieldSettings Width="Auto" AllowRecordFiltering="True" AllowEdit="False"/>
+                        </igDP:XamDataGrid.FieldSettings>
+                        <!--<igDP:XamDataGrid.FieldLayoutSettings>
+                            <igDP:FieldLayoutSettings HeaderPrefixAreaDisplayMode="FieldChooserButton"/>
+                        </igDP:XamDataGrid.FieldLayoutSettings>-->
+                    </igDP:XamDataGrid>
+                </Grid>
+            </igWin:TabItemEx>
+            
+        </igWin:XamTabControl>
+
+    </Grid>
+</Window>
